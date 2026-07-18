@@ -1,5 +1,5 @@
 const adminRepository = require('../repositories/admin.repository');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 
 const ORDER_FLOW = {
   Pending: ['Confirmed'],

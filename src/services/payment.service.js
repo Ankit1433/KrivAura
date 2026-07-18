@@ -1,5 +1,5 @@
 const paymentRepository = require('../repositories/payment.repository');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
 const razorpay = require('../config/razorpay');
 const crypto = require('crypto');

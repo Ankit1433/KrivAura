@@ -1,7 +1,7 @@
 const productRepository = require('../repositories/product.repository');
 const productImageRepository = require('../repositories/productImage.repository');
 
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 const messages = require('../constants/message');
 
 const uploadProductImage = async (productId, file) => {

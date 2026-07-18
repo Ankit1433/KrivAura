@@ -1,5 +1,5 @@
 const productRepository = require('../repositories/product.repository');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 const messages = require('../constants/message');
 
 const createProduct = async (product) => {

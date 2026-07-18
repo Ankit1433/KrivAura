@@ -1,5 +1,5 @@
 const wishlistRepository = require('../repositories/wishlist.repository');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
 
 const addWishlist = async (userId, productId) => {
