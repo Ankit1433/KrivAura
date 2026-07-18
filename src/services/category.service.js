@@ -2,7 +2,7 @@ const categoryRepository = require('../repositories/category.repository.js');
 const {
   createCategorySchema,
 } = require('../validations/category.validation.js');
-const { successResponse, errorResponse } = require('../utils/response.js');
+const { successResponse } = require('../utils/response.js');
 const messages = require('../constants/message.js');
 const AppError = require('../utils/AppError');
 
