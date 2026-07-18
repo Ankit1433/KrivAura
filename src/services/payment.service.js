@@ -1,7 +1,7 @@
 const paymentRepository = require('../repositories/payment.repository');
 const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
-const razorpay = require('../config/razorpay');
+const razorpay = require('../config/Razorpay');
 const crypto = require('crypto');
 const orderRepository = require('../repositories/order.repository');
 
