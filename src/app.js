@@ -23,12 +23,13 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 
-app.get('/api/v1/health', (req, res) => {
-  res
-    .status(200)
-    .json({ success: true, message: 'Krivara Backend Running 🚀' });
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'KrivAura API is Live 🚀',
+    version: '1.0.0',
+  });
 });
-
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
