@@ -4,9 +4,9 @@ const router = express.Router();
 
 const productController = require('../controllers/product.controller');
 
-const authenticate = require('../middleware/auth.middleware');
-const authorize = require('../middleware/authorize.middleware');
-const validate = require('../middleware/validate.middleware');
+const authenticate = require('../middlewares/auth.middleware');
+const authorize = require('../middlewares/authorize.middleware');
+const validate = require('../middlewares/validate.middleware');
 
 const { ADMIN } = require('../constants/roles');
 

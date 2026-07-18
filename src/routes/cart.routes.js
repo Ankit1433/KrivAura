@@ -4,9 +4,9 @@ const router = express.Router();
 
 const cartController = require('../controllers/cart.controller');
 
-const authenticate = require('../middleware/auth.middleware');
+const authenticate = require('../middlewares/auth.middleware');
 
-const validate = require('../middleware/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 
 const {
   addToCartSchema,

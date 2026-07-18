@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-const validate = require('../middleware/validate.middleware');
-const authenticate = require('../middleware/auth.middleware');
-const authorize = require('../middleware/authorize.middleware');
+const validate = require('../middlewares/validate.middleware');
+const authenticate = require('../middlewares/auth.middleware');
+const authorize = require('../middlewares/authorize.middleware');
 const { ADMIN } = require('../constants/roles');
 const {
   registerSchema,

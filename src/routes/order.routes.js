@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const orderController = require('../controllers/order.controller');
-const authenticate = require('../middleware/auth.middleware');
-const validate = require('../middleware/validate.middleware');
+const authenticate = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validate.middleware');
 const { createOrderSchema } = require('../validations/order.validation');
 
 router.post(

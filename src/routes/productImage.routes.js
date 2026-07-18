@@ -2,10 +2,10 @@ const express = require('express');
 
 const router = express.Router();
 
-const upload = require('../middleware/upload.middleware');
+const upload = require('../middlewares/upload.middleware');
 
-const authenticate = require('../middleware/auth.middleware');
-const authorize = require('../middleware/authorize.middleware');
+const authenticate = require('../middlewares/auth.middleware');
+const authorize = require('../middlewares/authorize.middleware');
 
 const { ADMIN } = require('../constants/roles');
 

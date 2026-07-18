@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const wishlistController = require('../controllers/wishlist.controller');
-const validate = require('../middleware/validate.middleware.js');
-const authenticate = require('../middleware/auth.middleware');
+const validate = require('../middlewares/validate.middleware.js');
+const authenticate = require('../middlewares/auth.middleware');
 const { addWishlistSchema } = require('../validations/wishlist.validation');
 
 router.post(
