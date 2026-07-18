@@ -9,7 +9,7 @@ const createProduct = async (product) => {
 
   if (!category) {
     throw new AppError(messages.CATEGORY_NOT_FOUND, 404);
-  }
+  } 
 
   const existingSku = await productRepository.findProductBySku(product.sku);
 

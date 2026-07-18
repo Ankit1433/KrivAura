@@ -1,6 +1,6 @@
 const { z } = require('zod');
 
-const createproductSchema = z.object({
+const createProductSchema = z.object({
   category_id: z.number().int().positive(),
 
   name: z
@@ -38,6 +38,6 @@ const updateProductSchema = z.object({
 });
 
 module.exports = {
-  createproductSchema,
+  createProductSchema,
   updateProductSchema,
 };
