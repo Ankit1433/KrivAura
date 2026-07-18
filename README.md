@@ -1,4 +1,4 @@
-# 🛍️ Ecommerce Backend API
+# 🛍️ Kriaura Backend API
 
 A production-ready Ecommerce Backend built with Node.js, Express.js and PostgreSQL following Clean Architecture.
 
