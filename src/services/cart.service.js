@@ -1,5 +1,5 @@
 const cartRepository = require('../repositories/cart.repository');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 const messages = require('../constants/message');
 
 const addToCart = async (userId, cart) => {

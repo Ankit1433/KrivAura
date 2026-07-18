@@ -4,7 +4,7 @@ const {
 } = require('../validations/category.validation.js');
 const { successResponse, errorResponse } = require('../utils/response.js');
 const messages = require('../constants/message.js');
-const AppError = require('../utils/appError');
+const AppError = require('../utils/AppError');
 
 const createCategory = async (category) => {
   const existingCategory = await categoryRepository.findcategoryByName(
