@@ -8,7 +8,7 @@ const validate = require('../middlewares/validate.middleware');
 const { createOrderSchema } = require('../validations/order.validation');
 
 router.post(
-  
+  '/create',
   authenticate,
   validate(createOrderSchema),
   orderController.createOrder,
