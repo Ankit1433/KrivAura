@@ -1,8 +1,30 @@
+const { Readable } = require('stream');
+
+const cloudinary = require('../config/cloudinary');
+
 const productRepository = require('../repositories/product.repository');
 const productImageRepository = require('../repositories/productImage.repository');
 
 const AppError = require('../utils/AppError');
 const messages = require('../constants/message');
+
+const streamifier = require('streamifier');
+
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'krivaura/products',
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      },
+    );
+
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
+};
 
 const uploadProductImage = async (productId, file) => {
   const product = await productRepository.getProductById(productId);
@@ -15,7 +37,9 @@ const uploadProductImage = async (productId, file) => {
     throw new AppError('Image is required', 400);
   }
 
-  const imageUrl = `/uploads/products/${file.filename}`;
+  const uploadResult = await uploadToCloudinary(file.buffer);
+
+  const imageUrl = uploadResult.secure_url;
 
   const thumbnail = await productImageRepository.hasThumbnail(productId);
 

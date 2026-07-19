@@ -33,6 +33,7 @@ A production-ready Ecommerce Backend built with Node.js, Express.js and PostgreS
 - Multer
 - Razorpay
 - Zod
+-cloudinary
 
 ---
 
