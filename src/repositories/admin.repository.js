@@ -12,7 +12,7 @@ const getOrders = async () => {
       o.created_at,
 
       u.id AS user_id,
-      u.name,
+      u.full_name,
       u.email
 
     FROM orders o
@@ -39,7 +39,7 @@ const getOrderById = async (orderId) => {
       o.created_at,
 
       u.id AS user_id,
-      u.name,
+      u.full_name,
       u.email
 
     FROM orders o
