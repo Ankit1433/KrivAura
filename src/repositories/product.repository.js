@@ -102,34 +102,47 @@ const getAllProducts = async () => {
 const getProductById = async (productId) => {
   const query = `
     SELECT
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.discount_price,
-      p.stock,
-      p.sku,
-      p.is_active,
-      p.created_at,
+    p.id,
+    p.name,
+    p.description,
+    p.price,
+    p.discount_price,
+    p.stock,
+    p.sku,
+    p.is_active,
+    p.created_at,
 
-      c.id AS category_id,
-      c.name AS category_name,
+    c.id AS category_id,
+    c.name AS category_name,
 
-      pi.image_url
+    COALESCE(
+        json_agg(
+            json_build_object(
+                'id', pi.id,
+                'image_url', pi.image_url,
+                'is_thumbnail', pi.is_thumbnail
+            )
+            ORDER BY pi.is_thumbnail DESC, pi.id
+        ) FILTER (WHERE pi.id IS NOT NULL),
+        '[]'
+    ) AS images
 
-    FROM products p
+FROM products p
 
-    INNER JOIN categories c
-      ON p.category_id = c.id
+INNER JOIN categories c
+ON p.category_id = c.id
 
-    LEFT JOIN product_images pi
-      ON p.id = pi.product_id
-      AND pi.is_thumbnail = TRUE
+LEFT JOIN product_images pi
+ON p.id = pi.product_id
 
-    WHERE
-      p.id = $1
-      AND p.is_active = TRUE
-      AND c.is_active = TRUE;
+WHERE
+    p.id = $1
+    AND p.is_active = TRUE
+    AND c.is_active = TRUE
+
+GROUP BY
+    p.id,
+    c.id;
   `;
 
   const result = await pool.query(query, [productId]);
