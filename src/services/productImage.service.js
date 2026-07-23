@@ -35,7 +35,8 @@ const uploadProductImages = async (productId, files) => {
     throw new AppError('At least one image is required', 400);
   }
 
-  const hasThumbnail = await productImageRepository.hasThumbnail(productId);
+  const thumbnail = await productImageRepository.hasThumbnail(productId);
+  const hasThumbnail = !!thumbnail;
 
   const uploadedImages = [];
 
