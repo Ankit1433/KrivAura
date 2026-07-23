@@ -21,7 +21,11 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ['https://krivaura.com', 'https://www.krivaura.com'],
+    origin: [
+      'https://krivaura.com',
+      'https://www.krivaura.com',
+      'http://localhost:3000',
+    ],
     credentials: true,
   }),
 );
