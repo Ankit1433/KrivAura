@@ -1,5 +1,3 @@
-const { Readable } = require('stream');
-
 const cloudinary = require('../config/cloudinary');
 
 const productRepository = require('../repositories/product.repository');
@@ -26,32 +24,36 @@ const uploadToCloudinary = (fileBuffer) => {
   });
 };
 
-const uploadProductImage = async (productId, file) => {
+const uploadProductImages = async (productId, files) => {
   const product = await productRepository.getProductById(productId);
 
   if (!product) {
     throw new AppError(messages.PRODUCT_NOT_FOUND, 404);
   }
 
-  if (!file) {
-    throw new AppError('Image is required', 400);
+  if (!files || files.length === 0) {
+    throw new AppError('At least one image is required', 400);
   }
 
-  const uploadResult = await uploadToCloudinary(file.buffer);
+  const hasThumbnail = await productImageRepository.hasThumbnail(productId);
 
-  const imageUrl = uploadResult.secure_url;
+  const uploadedImages = [];
 
-  const thumbnail = await productImageRepository.hasThumbnail(productId);
+  for (let i = 0; i < files.length; i++) {
+    const uploadResult = await uploadToCloudinary(files[i].buffer);
 
-  const isThumbnail = !thumbnail;
+    const image = await productImageRepository.createProductImage(
+      productId,
+      uploadResult.secure_url,
+      !hasThumbnail && i === 0,
+    );
 
-  return await productImageRepository.createProductImage(
-    productId,
-    imageUrl,
-    isThumbnail,
-  );
+    uploadedImages.push(image);
+  }
+
+  return uploadedImages;
 };
 
 module.exports = {
-  uploadProductImage,
+  uploadProductImages,
 };

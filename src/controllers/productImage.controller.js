@@ -9,12 +9,12 @@ const messages = require('../constants/message');
 const uploadProductImage = asyncHandler(async (req, res) => {
   const result = await productImageService.uploadProductImage(
     req.params.id,
-    req.file,
+    req.files,
   );
 
   return successResponse(res, 'Image uploaded successfully', result, 201);
 });
 
-module.exports = {
+module.exports = {  
   uploadProductImage,
 };

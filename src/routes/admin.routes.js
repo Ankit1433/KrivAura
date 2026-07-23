@@ -30,4 +30,5 @@ router.put(
   validate(updateOrderStatusSchema),
   adminController.updateOrderStatus,
 );
+
 module.exports = router;

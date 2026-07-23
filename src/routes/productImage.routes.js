@@ -15,7 +15,7 @@ router.post(
   '/:id/images',
   authenticate,
   authorize(ADMIN),
-  upload.single('image'),
+  upload.array('image', 10),
   productImageController.uploadProductImage,
 );
 
