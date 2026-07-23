@@ -7,8 +7,7 @@ const { successResponse } = require('../utils/response');
 const messages = require('../constants/message');
 
 const uploadProductImage = asyncHandler(async (req, res) => {
-  const result = await productImageService.upload
-  ProductImages(
+  const result = await productImageService.uploadProductImages(
     req.params.id,
     req.files,
   );
@@ -16,6 +15,6 @@ const uploadProductImage = asyncHandler(async (req, res) => {
   return successResponse(res, 'Image uploaded successfully', result, 201);
 });
 
-module.exports = {  
+module.exports = {
   uploadProductImage,
 };
