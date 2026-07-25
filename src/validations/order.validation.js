@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 const createOrderSchema = z.object({
-  shipping_address: z.string().min(5),
+  address_id: Joi.number().integer().required(),
 
   payment_method: z.enum(['COD', 'ONLINE']),
 });
