@@ -21,7 +21,7 @@ const createShipment = async (
         awb_code,
         courier_name,
         estimated_delivery,
-        labelUrl,
+        label_url
     )
     VALUES
     ($1,$2,$3,$4,$5,$6,$7,$8)
