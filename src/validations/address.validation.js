@@ -1,70 +1,71 @@
-const Joi = require('joi');
+const { z } = require('zod');
 
-const createAddressSchema = Joi.object({
-  full_name: Joi.string().trim().min(3).max(100).required(),
+const createAddressSchema = z.object({
+  full_name: z
+    .string()
+    .trim()
+    .min(3, 'Full name must be at least 3 characters')
+    .max(100, 'Full name cannot exceed 100 characters'),
 
-  phone: Joi.string()
-    .pattern(/^[0-9]{10}$/)
-    .required()
-    .messages({
-      'string.pattern.base': 'Phone number must be 10 digits',
-    }),
+  phone: z.string().regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
 
-  address_line1: Joi.string().trim().required(),
+  address_line1: z.string().trim().min(1, 'Address Line 1 is required'),
 
-  address_line2: Joi.string().allow('', null),
+  address_line2: z.string().optional(),
 
-  landmark: Joi.string().allow('', null),
+  landmark: z.string().optional(),
 
-  city: Joi.string().trim().required(),
+  city: z.string().trim().min(1, 'City is required'),
 
-  state: Joi.string().trim().required(),
+  state: z.string().trim().min(1, 'State is required'),
 
-  postal_code: Joi.string()
-    .pattern(/^[0-9]{6}$/)
-    .required()
-    .messages({
-      'string.pattern.base': 'Postal code must be 6 digits',
-    }),
+  postal_code: z.string().regex(/^[0-9]{6}$/, 'Postal code must be 6 digits'),
 
-  country: Joi.string().default('India'),
+  country: z.string().default('India'),
 
-  address_type: Joi.string().valid('Home', 'Office', 'Other').default('Home'),
+  address_type: z.enum(['Home', 'Office', 'Other']).default('Home'),
 
-  is_default: Joi.boolean().default(false),
+  is_default: z.boolean().default(false),
 });
 
-const updateAddressSchema = Joi.object({
-  full_name: Joi.string().trim().min(3).max(100),
+const updateAddressSchema = z
+  .object({
+    full_name: z
+      .string()
+      .trim()
+      .min(3, 'Full name must be at least 3 characters')
+      .max(100)
+      .optional(),
 
-  phone: Joi.string()
-    .pattern(/^[0-9]{10}$/)
-    .messages({
-      'string.pattern.base': 'Phone number must be 10 digits',
-    }),
+    phone: z
+      .string()
+      .regex(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+      .optional(),
 
-  address_line1: Joi.string(),
+    address_line1: z.string().optional(),
 
-  address_line2: Joi.string().allow('', null),
+    address_line2: z.string().optional(),
 
-  landmark: Joi.string().allow('', null),
+    landmark: z.string().optional(),
 
-  city: Joi.string(),
+    city: z.string().optional(),
 
-  state: Joi.string(),
+    state: z.string().optional(),
 
-  postal_code: Joi.string()
-    .pattern(/^[0-9]{6}$/)
-    .messages({
-      'string.pattern.base': 'Postal code must be 6 digits',
-    }),
+    postal_code: z
+      .string()
+      .regex(/^[0-9]{6}$/, 'Postal code must be 6 digits')
+      .optional(),
 
-  country: Joi.string(),
+    country: z.string().optional(),
 
-  address_type: Joi.string().valid('Home', 'Office', 'Other'),
+    address_type: z.enum(['Home', 'Office', 'Other']).optional(),
 
-  is_default: Joi.boolean(),
-}).min(1);
+    is_default: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field is required for update',
+  });
 
 module.exports = {
   createAddressSchema,
