@@ -6,7 +6,7 @@ const messages = require('../constants/message.js');
 const createOrder = asyncHandler(async (req, res) => {
   const order = await orderService.createOrder(
     req.user.id,
-    req.body.shipping_address,
+    req.body.address_id,
     req.body.payment_method,
   );
 

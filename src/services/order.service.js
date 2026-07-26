@@ -1,8 +1,35 @@
 const orderRepository = require('../repositories/order.repository');
 const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
+const addressRepository = require('../repositories/address.repository');
 
-const createOrder = async (userId, shippingAddress, paymentMethod) => {
+const createOrder = async (userId, addressId, paymentMethod) => {
+  // Validate address belongs to logged-in user
+  const address = await addressRepository.getAddressById(addressId, userId);
+
+  if (address.rows.length === 0) {
+    throw new AppError('Address not found', 404);
+  }
+
+  const a = address.rows[0];
+
+  // Create immutable snapshot
+  const shippingAddress = `
+${a.full_name}
+${a.phone}
+
+${a.address_line1}
+${a.address_line2 || ''}
+
+${a.landmark || ''}
+
+${a.city}, ${a.state}
+${a.postal_code}
+
+${a.country}
+`.trim();
+
+  // Get cart items
   const cartItems = await orderRepository.getCartItems(userId);
 
   if (!cartItems.length) {
@@ -19,25 +46,18 @@ const createOrder = async (userId, shippingAddress, paymentMethod) => {
     totalAmount += Number(item.price) * item.quantity;
   }
 
+  // Create order
   const order = await orderRepository.createOrder(
     userId,
     totalAmount,
+    addressId,
     shippingAddress,
     paymentMethod,
+    cartItems,
   );
-
-  for (const item of cartItems) {
-    await orderRepository.createOrderItem(
-      order.id,
-      item.product_id,
-      item.quantity,
-      item.price,
-    );
-  }
 
   return order;
 };
-
 const getOrders = async (userId) => {
   return await orderRepository.getOrders(userId);
 };

@@ -22,46 +22,71 @@ const getCartItems = async (userId) => {
 const createOrder = async (
   userId,
   totalAmount,
+  addressId,
   shippingAddress,
   paymentMethod,
+  cartItems,
 ) => {
-  const result = await pool.query(
-    `
-    INSERT INTO orders
-    (
-        user_id,
-        total_amount,
-        shipping_address,
-        payment_method,
-        payment_status,
-        order_status
-    )
-    VALUES ($1,$2,$3,$4,'Pending','Pending')
-    RETURNING *
-    `,
-    [userId, totalAmount, shippingAddress, paymentMethod],
-  );
+  const client = await pool.connect();
 
-  return result.rows[0];
-};
+  try {
+    await client.query('BEGIN');
 
-const createOrderItem = async (orderId, productId, quantity, price) => {
-  const result = await pool.query(
-    `
-    INSERT INTO order_items
-    (
-        order_id,
-        product_id,
-        quantity,
-        price
-    )
-    VALUES ($1,$2,$3,$4)
-    RETURNING *
-    `,
-    [orderId, productId, quantity, price],
-  );
+    const orderResult = await client.query(
+      `
+      INSERT INTO orders
+      (
+          user_id,
+          total_amount,
+          address_id,
+          shipping_address,
+          payment_method,
+          payment_status,
+          order_status
+      )
+      VALUES ($1,$2,$3,$4,$5,'Pending','Pending')
+      RETURNING *;
+      `,
+      [userId, totalAmount, addressId, shippingAddress, paymentMethod],
+    );
 
-  return result.rows[0];
+    const order = orderResult.rows[0];
+
+    for (const item of cartItems) {
+      await client.query(
+        `
+        INSERT INTO order_items
+        (
+            order_id,
+            product_id,
+            quantity,
+            price
+        )
+        VALUES ($1,$2,$3,$4)
+        `,
+        [order.id, item.product_id, item.quantity, item.price],
+      );
+    }
+
+    if (paymentMethod === 'COD') {
+      await client.query(
+        `
+        DELETE FROM carts
+        WHERE user_id = $1
+        `,
+        [userId],
+      );
+    }
+
+    await client.query('COMMIT');
+
+    return order;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 };
 
 const getOrders = async (userId) => {
@@ -246,7 +271,6 @@ const completeOrder = async (
 module.exports = {
   getCartItems,
   createOrder,
-  createOrderItem,
   getOrders,
   getOrderById,
   cancelOrder,
