@@ -154,14 +154,37 @@ const cancelShipment = async (shipmentId) => {
     throw new AppError('Shipment not found', 404);
   }
 
-  const response = await shipprime.cancelShipment(shipment.awb_code);
-
-  if (response.status === 'SUCCESS') {
-    await shipmentRepository.updateShipmentStatus(shipmentId, 'Cancelled');
+  if (shipment.shipment_status === 'Cancelled') {
+    throw new AppError('Shipment is already cancelled', 400);
   }
 
-  return response;
+  if (
+    ['Shipped', 'Out For Delivery', 'Delivered'].includes(
+      shipment.shipment_status,
+    )
+  ) {
+    throw new AppError(
+      `Shipment cannot be cancelled once it is ${shipment.shipment_status}`,
+      400,
+    );
+  }
+  const response = await shipprime.cancelShipment(shipment.awb_code);
+
+  let updatedShipment = shipment;
+
+  if (response.status === 'SUCCESS') {
+    updatedShipment = await shipmentRepository.updateShipmentStatus(
+      shipmentId,
+      'Cancelled',
+    );
+  }
+
+  return {
+    shipment: updatedShipment,
+    shipprime: response,
+  };
 };
+
 module.exports = {
   createShipment,
   getShipments,

@@ -195,6 +195,19 @@ const updateShipmentFromShipPrime = async (
 
   return result.rows[0];
 };
+
+const getShipmentByAwb = async (awbCode) => {
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM shipments
+    WHERE awb_code = $1;
+    `,
+    [awbCode],
+  );
+
+  return result.rows[0];
+};
 module.exports = {
   createShipment,
   getShipments,
@@ -204,4 +217,5 @@ module.exports = {
   updateShipmentStatus,
   updateTracking,
   updateShipmentFromShipPrime,
+  getShipmentByAwb,
 };
