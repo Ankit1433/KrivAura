@@ -1,5 +1,5 @@
 const addressRepository = require('../repositories/address.repository');
-const ApiError = require('../utils/ApiError');
+const ApiError = require('../utils/AppError');
 
 const createAddress = async (userId, data) => {
   if (data.is_default) {
