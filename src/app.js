@@ -15,6 +15,7 @@ const orderRoutes = require('./routes/order.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const adminRoutes = require('./routes/admin.routes');
 const addressRoutes = require('./routes/address.routes');
+const shipmentRoutes = require('./routes/shipment.routes');
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/addresses', addressRoutes);
+app.use('/api/v1/shipments', shipmentRoutes);
 
 app.use(errorHandler);
 module.exports = app;

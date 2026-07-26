@@ -268,6 +268,19 @@ const completeOrder = async (
   }
 };
 
+const getOrderByIdForShipment = async (orderId) => {
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM orders
+    WHERE id = $1;
+    `,
+    [orderId],
+  );
+
+  return result.rows[0];
+};
+
 module.exports = {
   getCartItems,
   createOrder,
@@ -275,4 +288,5 @@ module.exports = {
   getOrderById,
   cancelOrder,
   completeOrder,
+  getOrderByIdForShipment,
 };
