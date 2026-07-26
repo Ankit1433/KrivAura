@@ -100,19 +100,23 @@ const updateShipmentStatus = async (shipmentId, status) => {
     `
     UPDATE shipments
     SET
-        shipment_status = $1,
+        shipment_status = $1::shipment_status_enum,
         updated_at = CURRENT_TIMESTAMP,
+
         shipped_at = CASE
-            WHEN $1 = 'Shipped'
+            WHEN $1::text = 'Shipped'
             THEN CURRENT_TIMESTAMP
             ELSE shipped_at
         END,
+
         delivered_at = CASE
-            WHEN $1 = 'Delivered'
+            WHEN $1::text = 'Delivered'
             THEN CURRENT_TIMESTAMP
             ELSE delivered_at
         END
+
     WHERE id = $2
+
     RETURNING *;
     `,
     [status, shipmentId],
@@ -166,18 +170,18 @@ const updateShipmentFromShipPrime = async (
     `
     UPDATE shipments
     SET
-        shipment_status = $1,
-        estimated_delivery = $2,
+        shipment_status = $1::shipment_status_enum,
+        estimated_delivery = $2::date,
         updated_at = CURRENT_TIMESTAMP,
 
         shipped_at = CASE
-            WHEN $1 = 'Shipped'
+            WHEN $1::text = 'Shipped'
             THEN CURRENT_TIMESTAMP
             ELSE shipped_at
         END,
 
         delivered_at = CASE
-            WHEN $1 = 'Delivered'
+            WHEN $1::text = 'Delivered'
             THEN CURRENT_TIMESTAMP
             ELSE delivered_at
         END
