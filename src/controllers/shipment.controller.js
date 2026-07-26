@@ -67,10 +67,46 @@ const updateTracking = async (req, res, next) => {
   }
 };
 
+const trackShipment = async (req, res, next) => {
+  try {
+    const tracking = await shipmentService.trackShipment(req.params.id);
+
+    return successResponse(
+      res,
+      'Shipment tracking fetched successfully',
+      tracking,
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+const syncShipment = async (req, res, next) => {
+  try {
+    const shipment = await shipmentService.syncShipment(req.params.id);
+
+    return successResponse(res, 'Shipment synced successfully', shipment);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const cancelShipment = async (req, res, next) => {
+  try {
+    const response = await shipmentService.cancelShipment(req.params.id);
+
+    return successResponse(res, 'Shipment cancelled successfully', response);
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   createShipment,
   getShipments,
   getShipmentById,
   updateShipmentStatus,
   updateTracking,
+  trackShipment,
+  syncShipment,
+  cancelShipment,
 };

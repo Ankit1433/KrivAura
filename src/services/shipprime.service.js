@@ -30,11 +30,15 @@ const createForwardAwb = async (payload) => {
 const trackShipment = async (awb) => {
   try {
     const response = await client.get('/v1/forward/track', {
-      params: { awb },
+      params: {
+        awbs: awb,
+      },
     });
 
     return response.data;
   } catch (err) {
+    console.error(err.response?.data || err.message);
+
     throw new AppError(
       err.response?.data?.message || 'Unable to track shipment',
       err.response?.status || 500,

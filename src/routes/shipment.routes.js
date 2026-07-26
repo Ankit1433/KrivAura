@@ -27,6 +27,21 @@ router.post(
   validate(createShipmentSchema),
   shipmentController.createShipment,
 );
+router.get('/:id/track', authenticate, shipmentController.trackShipment);
+
+router.post(
+  '/:id/cancel',
+  authenticate,
+  authorize(ADMIN),
+  shipmentController.cancelShipment,
+);
+
+router.post(
+  '/:id/sync',
+  authenticate,
+  authorize(ADMIN),
+  shipmentController.syncShipment,
+);
 
 router.patch(
   '/:id/status',

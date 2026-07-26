@@ -35,7 +35,7 @@ const createShipment = async (
       awbCode,
       courierName,
       estimatedDelivery,
-      labelUrl, 
+      labelUrl,
     ],
   );
 
@@ -144,11 +144,60 @@ const updateTracking = async (
   return result.rows[0];
 };
 
+const getShipmentByIdForTracking = async (shipmentId) => {
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM shipments
+    WHERE id = $1;
+    `,
+    [shipmentId],
+  );
+
+  return result.rows[0];
+};
+
+const updateShipmentFromShipPrime = async (
+  shipmentId,
+  shipmentStatus,
+  estimatedDelivery,
+) => {
+  const result = await pool.query(
+    `
+    UPDATE shipments
+    SET
+        shipment_status = $1,
+        estimated_delivery = $2,
+        updated_at = CURRENT_TIMESTAMP,
+
+        shipped_at = CASE
+            WHEN $1 = 'Shipped'
+            THEN CURRENT_TIMESTAMP
+            ELSE shipped_at
+        END,
+
+        delivered_at = CASE
+            WHEN $1 = 'Delivered'
+            THEN CURRENT_TIMESTAMP
+            ELSE delivered_at
+        END
+
+    WHERE id = $3
+
+    RETURNING *;
+    `,
+    [shipmentStatus, estimatedDelivery, shipmentId],
+  );
+
+  return result.rows[0];
+};
 module.exports = {
   createShipment,
   getShipments,
   getShipmentById,
   getShipmentByOrderId,
+  getShipmentByIdForTracking,
   updateShipmentStatus,
   updateTracking,
+  updateShipmentFromShipPrime,
 };

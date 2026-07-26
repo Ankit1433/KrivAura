@@ -1,6 +1,7 @@
 const shipmentRepository = require('../repositories/shipment.repository');
 const orderRepository = require('../repositories/order.repository');
 const shipprime = require('./shipprime.service');
+const { mapShipPrimeStatus } = require('../helpers/shipmentStatusMapper');
 const { buildPayload } = require('../helpers/shipprimePayload.helper');
 const AppError = require('../utils/AppError');
 const messages = require('../constants/message');
@@ -33,10 +34,10 @@ const createShipment = async (data) => {
   // 4. Build ShipPrime Payload
   const payload = buildPayload(order);
 
-  console.log(JSON.stringify(payload, null, 2));
+  // console.log(JSON.stringify(payload, null, 2));
   // 5. Call ShipPrime
   const shipprimeResponse = await shipprime.createForwardAwb(payload);
-  console.log(shipprimeResponse);
+  // console.log(shipprimeResponse);
 
   // 6. Save in DB
   const shipment = await shipmentRepository.createShipment(
@@ -100,10 +101,67 @@ const updateTracking = async (
   return shipment;
 };
 
+const trackShipment = async (shipmentId) => {
+  const shipment =
+    await shipmentRepository.getShipmentByIdForTracking(shipmentId);
+
+  if (!shipment) {
+    throw new AppError('Shipment not found', 404);
+  }
+
+  const tracking = await shipprime.trackShipment(shipment.awb_code);
+
+  return tracking;
+};
+
+const syncShipment = async (shipmentId) => {
+  const shipment =
+    await shipmentRepository.getShipmentByIdForTracking(shipmentId);
+
+  if (!shipment) {
+    throw new AppError('Shipment not found', 404);
+  }
+
+  const tracking = await shipprime.trackShipment(shipment.awb_code);
+
+  if (!tracking || !tracking.length) {
+    throw new AppError('Tracking information not found', 404);
+  }
+
+  const latest = tracking[0];
+
+  const updatedShipment = await shipmentRepository.updateShipmentFromShipPrime(
+    shipmentId,
+    mapShipPrimeStatus(latest.currentStatus),
+    latest.estimatedDelivery || null,
+  );
+
+  return updatedShipment;
+};
+
+const cancelShipment = async (shipmentId) => {
+  const shipment =
+    await shipmentRepository.getShipmentByIdForTracking(shipmentId);
+
+  if (!shipment) {
+    throw new AppError('Shipment not found', 404);
+  }
+
+  const response = await shipprime.cancelShipment(shipment.awb_code);
+
+  if (response.status === 'SUCCESS') {
+    await shipmentRepository.updateShipmentStatus(shipmentId, 'Cancelled');
+  }
+
+  return response;
+};
 module.exports = {
   createShipment,
   getShipments,
   getShipmentById,
   updateShipmentStatus,
   updateTracking,
+  trackShipment,
+  syncShipment,
+  cancelShipment,
 };
