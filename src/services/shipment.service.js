@@ -33,6 +33,7 @@ const createShipment = async (data) => {
   // 4. Build ShipPrime Payload
   const payload = buildPayload(order);
 
+  console.log(JSON.stringify(payload, null, 2));
   // 5. Call ShipPrime
   const shipprimeResponse = await shipprime.createForwardAwb(payload);
   console.log(shipprimeResponse);

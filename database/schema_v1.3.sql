@@ -138,3 +138,10 @@ CHECK(stock >= 0);
 
 
 
+ALTER TABLE shipments
+ADD COLUMN label_url TEXT;
+
+
+
+ALTER TABLE products
+ADD COLUMN weight_grams INT DEFAULT 500;
