@@ -124,19 +124,26 @@ const syncShipment = async (shipmentId) => {
 
   const tracking = await shipprime.trackShipment(shipment.awb_code);
 
-  if (!tracking || !tracking.length) {
+  if (
+    tracking.status !== 'SUCCESS' ||
+    !tracking.results ||
+    tracking.results.length === 0
+  ) {
     throw new AppError('Tracking information not found', 404);
   }
 
-  const latest = tracking[0];
+  const latest = tracking.results[0];
 
   const updatedShipment = await shipmentRepository.updateShipmentFromShipPrime(
     shipmentId,
     mapShipPrimeStatus(latest.currentStatus),
-    latest.estimatedDelivery || null,
+    null,
   );
 
-  return updatedShipment;
+  return {
+    shipment: updatedShipment,
+    tracking,
+  };
 };
 
 const cancelShipment = async (shipmentId) => {

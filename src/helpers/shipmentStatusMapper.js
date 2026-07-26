@@ -3,6 +3,9 @@ const mapShipPrimeStatus = (status) => {
     case 'CONFIRMED':
       return 'Pending';
 
+    case 'PACKED':
+      return 'Packed';
+
     case 'OUT_FOR_PICKUP':
       return 'Packed';
 
