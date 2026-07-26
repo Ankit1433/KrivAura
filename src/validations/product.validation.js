@@ -35,6 +35,7 @@ const updateProductSchema = z.object({
   name: z.string().trim().min(3).max(200).optional(),
   description: z.string().trim().optional(),
   price: z.number().positive().optional(),
+  weight_grams: z.coerce.number().int().positive().default(100),
 });
 
 module.exports = {

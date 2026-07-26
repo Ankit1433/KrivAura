@@ -8,6 +8,7 @@ const createShipment = async (
   awbCode,
   courierName,
   estimatedDelivery,
+  labelUrl,
 ) => {
   const result = await pool.query(
     `
@@ -19,10 +20,11 @@ const createShipment = async (
         tracking_number,
         awb_code,
         courier_name,
-        estimated_delivery
+        estimated_delivery,
+        labelUrl,
     )
     VALUES
-    ($1,$2,$3,$4,$5,$6,$7)
+    ($1,$2,$3,$4,$5,$6,$7,$8)
     RETURNING *;
     `,
     [
@@ -33,6 +35,7 @@ const createShipment = async (
       awbCode,
       courierName,
       estimatedDelivery,
+      labelUrl, 
     ],
   );
 

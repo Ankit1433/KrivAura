@@ -281,6 +281,87 @@ const getOrderByIdForShipment = async (orderId) => {
   return result.rows[0];
 };
 
+const getOrderForShipment = async (orderId) => {
+  // Order + Address
+  const orderResult = await pool.query(
+    `
+    SELECT
+        o.*,
+
+        a.full_name,
+        a.phone,
+        a.address_line1,
+        a.address_line2,
+        a.city,
+        a.state,
+        a.postal_code,
+        a.country
+
+    FROM orders o
+
+    INNER JOIN addresses a
+        ON o.address_id = a.id
+
+    WHERE o.id = $1
+    `,
+    [orderId],
+  );
+
+  if (!orderResult.rows.length) {
+    return null;
+  }
+
+  // Order Items
+  const itemsResult = await pool.query(
+    `
+    SELECT
+        oi.product_id,
+        oi.quantity,
+        oi.price,
+
+        p.name,
+        p.sku,
+        p.weight_grams,
+
+        pi.image_url
+
+    FROM order_items oi
+
+    INNER JOIN products p
+        ON oi.product_id = p.id
+
+    LEFT JOIN product_images pi
+        ON p.id = pi.product_id
+       AND pi.is_thumbnail = TRUE
+
+    WHERE oi.order_id = $1
+    `,
+    [orderId],
+  );
+
+  const order = orderResult.rows[0];
+
+  return {
+    id: order.id,
+    total_amount: order.total_amount,
+    payment_method: order.payment_method,
+    order_status: order.order_status,
+
+    address: {
+      full_name: order.full_name,
+      phone: order.phone,
+      address_line1: order.address_line1,
+      address_line2: order.address_line2,
+      city: order.city,
+      state: order.state,
+      postal_code: order.postal_code,
+      country: order.country,
+    },
+
+    items: itemsResult.rows,
+  };
+};
+
 module.exports = {
   getCartItems,
   createOrder,
@@ -289,4 +370,5 @@ module.exports = {
   cancelOrder,
   completeOrder,
   getOrderByIdForShipment,
+  getOrderForShipment,
 };

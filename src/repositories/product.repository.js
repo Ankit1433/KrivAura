@@ -32,13 +32,14 @@ const createProduct = async (product) => {
             name,
             description,
             price,
+            weight_grams,
             discount_price,
             stock,
             sku
         )
         VALUES
         (
-            $1,$2,$3,$4,$5,$6,$7
+            $1,$2,$3,$4,$5,$6,$7,$8
         )
        RETURNING
         id,
@@ -46,6 +47,7 @@ const createProduct = async (product) => {
         name,
         description,
         price,
+        weight_grams,
         discount_price,
         stock,
         sku,
@@ -59,6 +61,7 @@ const createProduct = async (product) => {
     product.name,
     product.description,
     product.price,
+    product.weight_grams,
     product.discount_price,
     product.stock,
     product.sku,
@@ -76,6 +79,7 @@ const getAllProducts = async () => {
         p.name,
         p.description,
         p.price,
+        p.weight_grams,
         p.discount_price,
         p.stock,
         p.sku,
@@ -106,6 +110,7 @@ const getProductById = async (productId) => {
     p.name,
     p.description,
     p.price,
+    p.weight_grams,
     p.discount_price,
     p.stock,
     p.sku,
@@ -158,11 +163,12 @@ const updateProduct = async (productId, product) => {
             name = $2,
             description = $3,
             price = $4,
-            discount_price = $5,
-            stock = $6,
-            sku = $7,
+            weight_grams= $5,
+            discount_price = $6,
+            stock = $7,
+            sku = $8,
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = $8
+        WHERE id = $9
         AND is_active = TRUE
         RETURNING
           id,
@@ -170,6 +176,7 @@ const updateProduct = async (productId, product) => {
           name,
           description,
           price,
+          weight_grams,
           discount_price,
           stock,
           sku,
@@ -183,6 +190,7 @@ const updateProduct = async (productId, product) => {
     product.name,
     product.description,
     product.price,
+    product.weight_grams,
     product.discount_price,
     product.stock,
     product.sku,
