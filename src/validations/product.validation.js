@@ -28,6 +28,8 @@ const createProductSchema = z.object({
   stock: z.number().int().min(0, 'Stock cannot be negative'),
 
   sku: z.string().trim().min(3).max(100),
+
+  weight_grams: z.coerce.number().int().positive().default(100),
 });
 
 const updateProductSchema = z.object({
