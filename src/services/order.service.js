@@ -4,12 +4,6 @@ const messages = require('../constants/message.js');
 const addressRepository = require('../repositories/address.repository');
 const couponService = require('./coupon.service.js');
 
-const orderRepository = require('../repositories/order.repository');
-const AppError = require('../utils/AppError');
-const messages = require('../constants/message.js');
-const addressRepository = require('../repositories/address.repository');
-const couponService = require('../services/coupon.service.js');
-
 const createOrder = async (
   userId,
   addressId,
