@@ -3,8 +3,8 @@ const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
 const addressRepository = require('../repositories/address.repository');
 
-const createOrder = async (userId, addressId, paymentMethod) => {
-  // Validate address belongs to logged-in user
+const createOrder = async (userId, addressId, paymentMethod, items) => {
+  // Validate address belongs to user
   const address = await addressRepository.getAddressById(addressId, userId);
 
   if (address.rows.length === 0) {
@@ -13,7 +13,7 @@ const createOrder = async (userId, addressId, paymentMethod) => {
 
   const a = address.rows[0];
 
-  // Create immutable snapshot
+  // Immutable shipping snapshot
   const shippingAddress = `
 ${a.full_name}
 ${a.phone}
@@ -29,35 +29,56 @@ ${a.postal_code}
 ${a.country}
 `.trim();
 
-  // Get cart items
-  const cartItems = await orderRepository.getCartItems(userId);
-
-  if (!cartItems.length) {
+  if (!items || !items.length) {
     throw new AppError(messages.CART_EMPTY, 400);
+  }
+
+  // Get product information from DB
+  const productItems = await orderRepository.getProductsForOrder(items);
+
+  if (productItems.length !== items.length) {
+    throw new AppError('One or more products were not found', 404);
   }
 
   let totalAmount = 0;
 
-  for (const item of cartItems) {
-    if (item.quantity > item.stock) {
+  const finalItems = [];
+
+  for (const item of items) {
+    const product = productItems.find((p) => Number(p.id) === Number(item.id));
+
+    if (!product) {
+      throw new AppError('Product not found', 404);
+    }
+
+    if (item.quantity > product.stock) {
       throw new AppError(messages.INSUFFICIENT_STOCK, 400);
     }
 
-    totalAmount += Number(item.price) * item.quantity;
+    const price = Number(product.discount_price || product.price);
+
+    totalAmount += price * item.quantity;
+
+    finalItems.push({
+      product_id: product.id,
+      quantity: item.quantity,
+      price,
+      selected_size: item.selectedSize || null,
+    });
   }
 
-  // Create order
   const order = await orderRepository.createOrder(
     userId,
     totalAmount,
     addressId,
     shippingAddress,
     paymentMethod,
-    cartItems,
+    finalItems,
   );
 
   return order;
 };
+
 const getOrders = async (userId) => {
   return await orderRepository.getOrders(userId);
 };

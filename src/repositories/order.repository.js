@@ -25,12 +25,14 @@ const createOrder = async (
   addressId,
   shippingAddress,
   paymentMethod,
-  cartItems,
+  orderItems,
 ) => {
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
+
+    const orderStatus = paymentMethod === 'COD' ? 'Confirmed' : 'Pending';
 
     const orderResult = await client.query(
       `
@@ -44,15 +46,22 @@ const createOrder = async (
           payment_status,
           order_status
       )
-      VALUES ($1,$2,$3,$4,$5,'Pending','Pending')
+      VALUES ($1,$2,$3,$4,$5,'Pending',$6)
       RETURNING *;
       `,
-      [userId, totalAmount, addressId, shippingAddress, paymentMethod],
+      [
+        userId,
+        totalAmount,
+        addressId,
+        shippingAddress,
+        paymentMethod,
+        orderStatus,
+      ],
     );
 
     const order = orderResult.rows[0];
 
-    for (const item of cartItems) {
+    for (const item of orderItems) {
       await client.query(
         `
         INSERT INTO order_items
@@ -60,15 +69,43 @@ const createOrder = async (
             order_id,
             product_id,
             quantity,
-            price
+            price,
+            selected_size
         )
-        VALUES ($1,$2,$3,$4)
+        VALUES ($1,$2,$3,$4,$5)
         `,
-        [order.id, item.product_id, item.quantity, item.price],
+        [
+          order.id,
+          item.product_id,
+          item.quantity,
+          item.price,
+          item.selected_size,
+        ],
       );
     }
 
+    // COD: order is immediately confirmed,
+    // so reduce stock and clear cart.
     if (paymentMethod === 'COD') {
+      for (const item of orderItems) {
+        const stockResult = await client.query(
+          `
+          UPDATE products
+          SET
+              stock = stock - $1,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = $2
+            AND stock >= $1
+          RETURNING id
+          `,
+          [item.quantity, item.product_id],
+        );
+
+        if (!stockResult.rows.length) {
+          throw new Error('Insufficient Stock');
+        }
+      }
+
       await client.query(
         `
         DELETE FROM carts
@@ -362,6 +399,26 @@ const getOrderForShipment = async (orderId) => {
   };
 };
 
+const getProductsForOrder = async (items) => {
+  const productIds = items.map((item) => item.id);
+
+  const result = await pool.query(
+    `
+    SELECT
+        id,
+        price,
+        discount_price,
+        stock
+    FROM products
+    WHERE id = ANY($1::int[])
+      AND is_active = TRUE
+    `,
+    [productIds],
+  );
+
+  return result.rows;
+};
+
 module.exports = {
   getCartItems,
   createOrder,
@@ -371,4 +428,5 @@ module.exports = {
   completeOrder,
   getOrderByIdForShipment,
   getOrderForShipment,
+  getProductsForOrder,
 };

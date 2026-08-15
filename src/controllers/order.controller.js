@@ -7,7 +7,8 @@ const createOrder = asyncHandler(async (req, res) => {
   const order = await orderService.createOrder(
     req.user.id,
     req.body.address_id,
-    req.body.payment_method,
+    req.body.paymentMethod,
+    req.body.items,
   );
 
   return successResponse(res, messages.ORDER_CREATED, order);
