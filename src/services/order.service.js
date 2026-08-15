@@ -8,7 +8,7 @@ const createOrder = async (
   addressId,
   paymentMethod,
   items,
-  discount_code,
+  discountCode,
 ) => {
   // Validate address belongs to user
   const address = await addressRepository.getAddressById(addressId, userId);
