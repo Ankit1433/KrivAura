@@ -9,6 +9,7 @@ const createOrder = asyncHandler(async (req, res) => {
     req.body.address_id,
     req.body.paymentMethod,
     req.body.items,
+    req.body.discount_code,
   );
 
   return successResponse(res, messages.ORDER_CREATED, order);

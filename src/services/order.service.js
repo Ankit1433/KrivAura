@@ -3,7 +3,13 @@ const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
 const addressRepository = require('../repositories/address.repository');
 
-const createOrder = async (userId, addressId, paymentMethod, items) => {
+const createOrder = async (
+  userId,
+  addressId,
+  paymentMethod,
+  items,
+  discount_code,
+) => {
   // Validate address belongs to user
   const address = await addressRepository.getAddressById(addressId, userId);
 
@@ -59,6 +65,21 @@ ${a.country}
 
     totalAmount += price * item.quantity;
 
+    let discountAmount = 0;
+    let couponId = null;
+
+    if (discountCode) {
+      const couponResult = await couponService.getCouponDiscount(
+        discountCode,
+        totalAmount,
+      );
+
+      discountAmount = couponResult.discount;
+      couponId = couponResult.coupon.id;
+    }
+
+    const finalAmount = Number((totalAmount - discountAmount).toFixed(2));
+
     finalItems.push({
       product_id: product.id,
       quantity: item.quantity,
@@ -69,11 +90,13 @@ ${a.country}
 
   const order = await orderRepository.createOrder(
     userId,
-    totalAmount,
+    finalAmount,
     addressId,
     shippingAddress,
     paymentMethod,
     finalItems,
+    couponId,
+    discountAmount,
   );
 
   return order;

@@ -26,29 +26,52 @@ const createOrder = async (
   shippingAddress,
   paymentMethod,
   orderItems,
+  couponId,
+  discountAmount,
 ) => {
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
+    // -----------------------------------------
+    // 1. Determine order status
+    // -----------------------------------------
+
     const orderStatus = paymentMethod === 'COD' ? 'Confirmed' : 'Pending';
+
+    // -----------------------------------------
+    // 2. Create order
+    // -----------------------------------------
 
     const orderResult = await client.query(
       `
-      INSERT INTO orders
-      (
-          user_id,
-          total_amount,
-          address_id,
-          shipping_address,
-          payment_method,
-          payment_status,
-          order_status
-      )
-      VALUES ($1,$2,$3,$4,$5,'Pending',$6)
-      RETURNING *;
-      `,
+        INSERT INTO orders
+        (
+            user_id,
+            total_amount,
+            address_id,
+            shipping_address,
+            payment_method,
+            payment_status,
+            order_status,
+            coupon_id,
+            discount_amount
+        )
+        VALUES
+        (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            'Pending',
+            $6,
+            $7,
+            $8
+        )
+        RETURNING *;
+        `,
       [
         userId,
         totalAmount,
@@ -56,10 +79,16 @@ const createOrder = async (
         shippingAddress,
         paymentMethod,
         orderStatus,
+        couponId,
+        discountAmount,
       ],
     );
 
     const order = orderResult.rows[0];
+
+    // -----------------------------------------
+    // 3. Create order items
+    // -----------------------------------------
 
     for (const item of orderItems) {
       await client.query(
@@ -72,7 +101,14 @@ const createOrder = async (
             price,
             selected_size
         )
-        VALUES ($1,$2,$3,$4,$5)
+        VALUES
+        (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5
+        )
         `,
         [
           order.id,
@@ -84,20 +120,50 @@ const createOrder = async (
       );
     }
 
-    // COD: order is immediately confirmed,
-    // so reduce stock and clear cart.
+    // -----------------------------------------
+    // 4. Increment coupon usage
+    // -----------------------------------------
+
+    if (couponId) {
+      const usageResult = await client.query(
+        `
+          UPDATE coupons
+          SET
+            used_count = used_count + 1,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = $1
+            AND
+            (
+              usage_limit IS NULL
+              OR used_count < usage_limit
+            )
+          RETURNING id;
+          `,
+        [couponId],
+      );
+
+      if (!usageResult.rows.length) {
+        throw new Error('Coupon usage limit reached');
+      }
+    }
+
+    // -----------------------------------------
+    // 5. COD processing
+    // -----------------------------------------
+
     if (paymentMethod === 'COD') {
       for (const item of orderItems) {
         const stockResult = await client.query(
           `
-          UPDATE products
-          SET
+            UPDATE products
+            SET
               stock = stock - $1,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = $2
-            AND stock >= $1
-          RETURNING id
-          `,
+              updated_at =
+                CURRENT_TIMESTAMP
+            WHERE id = $2
+              AND stock >= $1
+            RETURNING id;
+            `,
           [item.quantity, item.product_id],
         );
 
@@ -106,6 +172,7 @@ const createOrder = async (
         }
       }
 
+      // Clear cart for COD
       await client.query(
         `
         DELETE FROM carts
@@ -115,11 +182,16 @@ const createOrder = async (
       );
     }
 
+    // -----------------------------------------
+    // 6. Commit
+    // -----------------------------------------
+
     await client.query('COMMIT');
 
     return order;
   } catch (err) {
     await client.query('ROLLBACK');
+
     throw err;
   } finally {
     client.release();
@@ -405,7 +477,7 @@ const getProductsForOrder = async (items) => {
   const result = await pool.query(
     `
     SELECT
-        id,
+        id, 
         price,
         discount_price,
         stock

@@ -5,6 +5,8 @@ const createOrderSchema = z.object({
 
   paymentMethod: z.enum(['COD', 'ONLINE']),
 
+  discount_code: z.string().trim().min(1).optional().nullable(),
+
   items: z
     .array(
       z.object({
