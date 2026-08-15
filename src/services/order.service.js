@@ -2,6 +2,13 @@ const orderRepository = require('../repositories/order.repository');
 const AppError = require('../utils/AppError');
 const messages = require('../constants/message.js');
 const addressRepository = require('../repositories/address.repository');
+const couponService = require('./coupon.service.js');
+
+const orderRepository = require('../repositories/order.repository');
+const AppError = require('../utils/AppError');
+const messages = require('../constants/message.js');
+const addressRepository = require('../repositories/address.repository');
+const couponService = require('../services/coupon.service.js');
 
 const createOrder = async (
   userId,
@@ -10,7 +17,7 @@ const createOrder = async (
   items,
   discountCode,
 ) => {
-  // Validate address belongs to user
+  // 1. Validate address
   const address = await addressRepository.getAddressById(addressId, userId);
 
   if (address.rows.length === 0) {
@@ -19,7 +26,7 @@ const createOrder = async (
 
   const a = address.rows[0];
 
-  // Immutable shipping snapshot
+  // 2. Create immutable shipping snapshot
   const shippingAddress = `
 ${a.full_name}
 ${a.phone}
@@ -35,17 +42,19 @@ ${a.postal_code}
 ${a.country}
 `.trim();
 
+  // 3. Validate items
   if (!items || !items.length) {
     throw new AppError(messages.CART_EMPTY, 400);
   }
 
-  // Get product information from DB
+  // 4. Get products from DB
   const productItems = await orderRepository.getProductsForOrder(items);
 
   if (productItems.length !== items.length) {
     throw new AppError('One or more products were not found', 404);
   }
 
+  // 5. Calculate original total
   let totalAmount = 0;
 
   const finalItems = [];
@@ -57,28 +66,15 @@ ${a.country}
       throw new AppError('Product not found', 404);
     }
 
+    // Check stock
     if (item.quantity > product.stock) {
       throw new AppError(messages.INSUFFICIENT_STOCK, 400);
     }
 
+    // Use discount_price if available
     const price = Number(product.discount_price || product.price);
 
     totalAmount += price * item.quantity;
-
-    let discountAmount = 0;
-    let couponId = null;
-
-    if (discountCode) {
-      const couponResult = await couponService.getCouponDiscount(
-        discountCode,
-        totalAmount,
-      );
-
-      discountAmount = couponResult.discount;
-      couponId = couponResult.coupon.id;
-    }
-
-    const finalAmount = Number((totalAmount - discountAmount).toFixed(2));
 
     finalItems.push({
       product_id: product.id,
@@ -88,6 +84,25 @@ ${a.country}
     });
   }
 
+  totalAmount = Number(totalAmount.toFixed(2));
+
+  // 6. Apply coupon AFTER complete total is calculated
+  let discountAmount = 0;
+  let couponId = null;
+  let finalAmount = totalAmount;
+
+  if (discountCode) {
+    const couponResult = await couponService.getCouponDiscount(
+      discountCode,
+      totalAmount,
+    );
+
+    discountAmount = couponResult.discount;
+    couponId = couponResult.coupon.id;
+    finalAmount = couponResult.finalAmount;
+  }
+
+  // 7. Create order
   const order = await orderRepository.createOrder(
     userId,
     finalAmount,
