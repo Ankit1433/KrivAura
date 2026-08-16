@@ -18,55 +18,79 @@ const findProductById = async (productId) => {
   return result.rows[0];
 };
 
-const findCartItem = async (userId, productId) => {
+const findCartItem = async (userId, productId, selectedSize) => {
   const query = `
     SELECT
       id,
-      quantity
+      quantity,
+      selected_size
     FROM carts
     WHERE
       user_id = $1
-      AND product_id = $2;
+      AND product_id = $2
+      AND selected_size IS NOT DISTINCT FROM $3;
   `;
 
-  const result = await pool.query(query, [userId, productId]);
+  const result = await pool.query(query, [
+    userId,
+    productId,
+    selectedSize || null,
+  ]);
 
   return result.rows[0];
 };
 
-const addToCart = async (userId, productId, quantity) => {
+const addToCart = async (userId, productId, quantity, selectedSize) => {
   const query = `
     INSERT INTO carts
     (
       user_id,
       product_id,
-      quantity
+      quantity,
+      selected_size
     )
     VALUES
     (
-      $1,$2,$3
+      $1, $2, $3, $4
     )
     RETURNING *;
   `;
 
-  const result = await pool.query(query, [userId, productId, quantity]);
+  const result = await pool.query(query, [
+    userId,
+    productId,
+    quantity,
+    selectedSize || null,
+  ]);
 
   return result.rows[0];
 };
 
-const updateCartQuantity = async (userId, cartId, quantity) => {
+const updateCartQuantity = async (
+  userId,
+  productId,
+  quantity,
+  selectedSize,
+) => {
   const query = `
     UPDATE carts
     SET
       quantity = $1,
+      selected_size = $2,
       updated_at = CURRENT_TIMESTAMP
     WHERE
-      id = $2
-      AND user_id = $3
+      user_id = $3
+      AND product_id = $4
+      AND selected_size IS NOT DISTINCT FROM $2
     RETURNING *;
   `;
 
-  const result = await pool.query(query, [quantity, cartId, userId]);
+  const result = await pool.query(query, [
+    quantity,
+    selectedSize || null,
+    userId,
+    productId,
+  ]);
 
   return result.rows[0];
 };
@@ -75,9 +99,10 @@ const getCart = async (userId) => {
   const query = `
     SELECT
       c.id AS cart_id,
+      c.product_id,
       c.quantity,
+      c.selected_size,
 
-      p.id AS product_id,
       p.name,
       p.price,
       p.discount_price,
@@ -111,38 +136,47 @@ const getCart = async (userId) => {
   return result.rows;
 };
 
-const deleteCartItem = async (userId, cartId) => {
+const deleteCartItem = async (userId, productId) => {
   const query = `
     DELETE FROM carts
     WHERE
-      id = $1
+      product_id = $1
       AND user_id = $2
     RETURNING *;
   `;
 
-  const result = await pool.query(query, [cartId, userId]);
+  const result = await pool.query(query, [productId, userId]);
 
   return result.rows[0];
 };
 
-const getCartItemById = async (userId, cartId) => {
+const getCartItemByProductId = async (userId, productId, selectedSize) => {
   const query = `
     SELECT
       c.id,
       c.user_id,
       c.product_id,
       c.quantity,
+      c.selected_size,
       p.stock
+
     FROM carts c
+
     INNER JOIN products p
       ON c.product_id = p.id
+
     WHERE
-      c.id = $1
+      c.product_id = $1
       AND c.user_id = $2
+      AND c.selected_size IS NOT DISTINCT FROM $3
       AND p.is_active = TRUE;
   `;
 
-  const result = await pool.query(query, [cartId, userId]);
+  const result = await pool.query(query, [
+    productId,
+    userId,
+    selectedSize || null,
+  ]);
 
   return result.rows[0];
 };
@@ -154,5 +188,5 @@ module.exports = {
   updateCartQuantity,
   getCart,
   deleteCartItem,
-  getCartItemById,
+  getCartItemByProductId,
 };

@@ -19,15 +19,19 @@ const getCart = asyncHandler(async (req, res) => {
 const updateCartQuantity = asyncHandler(async (req, res) => {
   const result = await cartService.updateCartQuantity(
     req.user.id,
-    req.params.id,
+    req.params.productId,
     req.body.quantity,
+    req.body.selected_size,
   );
 
   return successResponse(res, messages.CART_UPDATED, result);
 });
 
 const deleteCartItem = asyncHandler(async (req, res) => {
-  const result = await cartService.deleteCartItem(req.user.id, req.params.id);
+  const result = await cartService.deleteCartItem(
+    req.user.id,
+    req.params.productId,
+  );
 
   return successResponse(res, messages.CART_ITEM_REMOVED, result);
 });

@@ -23,12 +23,12 @@ router.post(
 router.get('/', authenticate, cartController.getCart);
 
 router.put(
-  '/:id',
+  '/:productId',
   authenticate,
   validate(updateCartSchema),
   cartController.updateCartQuantity,
 );
 
-router.delete('/:id', authenticate, cartController.deleteCartItem);
+router.delete('/:productId', authenticate, cartController.deleteCartItem);
 
 module.exports = router;
