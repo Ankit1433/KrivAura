@@ -136,16 +136,21 @@ const getCart = async (userId) => {
   return result.rows;
 };
 
-const deleteCartItem = async (userId, productId) => {
+const deleteCartItem = async (userId, productId, selectedSize) => {
   const query = `
     DELETE FROM carts
     WHERE
       product_id = $1
       AND user_id = $2
+      AND selected_size IS NOT DISTINCT FROM $3
     RETURNING *;
   `;
 
-  const result = await pool.query(query, [productId, userId]);
+  const result = await pool.query(query, [
+    productId,
+    userId,
+    selectedSize || null,
+  ]);
 
   return result.rows[0];
 };

@@ -16,6 +16,10 @@ router.post(
 
 router.get('/', authenticate, wishlistController.getWishlist);
 
-router.delete('/:id', authenticate, wishlistController.deleteWishlistItem);
+router.delete(
+  '/:productId',
+  authenticate,
+  wishlistController.deleteWishlistItem,
+);
 
 module.exports = router;

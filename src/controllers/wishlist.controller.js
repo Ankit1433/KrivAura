@@ -21,7 +21,7 @@ const getWishlist = asyncHandler(async (req, res) => {
 const deleteWishlistItem = asyncHandler(async (req, res) => {
   const wishlist = await wishlistService.deleteWishlistItem(
     req.user.id,
-    req.params.id,
+    req.params.productId,
   );
 
   return successResponse(res, messages.WISHLIST_REMOVED, wishlist);

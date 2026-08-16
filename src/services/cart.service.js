@@ -74,8 +74,12 @@ const updateCartQuantity = async (
   );
 };
 
-const deleteCartItem = async (userId, productId) => {
-  const cartItem = await cartRepository.deleteCartItem(userId, productId);
+const deleteCartItem = async (userId, productId, selectedSize) => {
+  const cartItem = await cartRepository.deleteCartItem(
+    userId,
+    productId,
+    selectedSize,
+  );
 
   if (!cartItem) {
     throw new AppError(messages.CART_NOT_FOUND, 404);
@@ -83,7 +87,6 @@ const deleteCartItem = async (userId, productId) => {
 
   return cartItem;
 };
-
 module.exports = {
   addToCart,
   getCart,

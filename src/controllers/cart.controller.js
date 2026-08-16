@@ -31,10 +31,12 @@ const deleteCartItem = asyncHandler(async (req, res) => {
   const result = await cartService.deleteCartItem(
     req.user.id,
     req.params.productId,
+    req.query.selected_size,
   );
 
   return successResponse(res, messages.CART_ITEM_REMOVED, result);
 });
+
 module.exports = {
   addToCart,
   getCart,

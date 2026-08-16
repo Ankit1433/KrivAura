@@ -71,15 +71,15 @@ const getWishlist = async (userId) => {
   return result.rows;
 };
 
-const deleteWishlistItem = async (userId, wishlistId) => {
+const deleteWishlistItem = async (userId, productId) => {
   const result = await pool.query(
     `
     DELETE FROM wishlists
-    WHERE id = $1
+    WHERE product_id = $1
     AND user_id = $2
     RETURNING *
     `,
-    [wishlistId, userId],
+    [productId, userId],
   );
 
   return result.rows[0];

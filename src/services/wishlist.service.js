@@ -25,10 +25,10 @@ const getWishlist = async (userId) => {
   return await wishlistRepository.getWishlist(userId);
 };
 
-const deleteWishlistItem = async (userId, wishlistId) => {
+const deleteWishlistItem = async (userId, productId) => {
   const wishlist = await wishlistRepository.deleteWishlistItem(
     userId,
-    wishlistId,
+    productId,
   );
 
   if (!wishlist) {
