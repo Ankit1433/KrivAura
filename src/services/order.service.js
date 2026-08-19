@@ -44,7 +44,9 @@ ${a.country}
   // 4. Get products from DB
   const productItems = await orderRepository.getProductsForOrder(items);
 
-  if (productItems.length !== items.length) {
+  const uniqueProductIds = [...new Set(items.map((item) => Number(item.id)))];
+
+  if (productItems.length !== uniqueProductIds.length) {
     throw new AppError('One or more products were not found', 404);
   }
 
