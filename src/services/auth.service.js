@@ -2,6 +2,7 @@ const authRepository = require('../repositories/auth.repository');
 const messages = require('../constants/message');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const AppError = require('../utils/AppError');
 
 const register = async (user) => {
   const existingUser = await authRepository.finduserByEmail(user.email);
