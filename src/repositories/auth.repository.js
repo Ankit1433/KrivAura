@@ -35,4 +35,29 @@ const finduserByEmail = async (email) => {
   return result.rows[0];
 };
 
-module.exports = { register, finduserByEmail };
+const getUserById = async (userId) => {
+  const result = await pool.query(
+    `
+    SELECT id, password
+    FROM users
+    WHERE id = $1
+    `,
+    [userId],
+  );
+
+  return result.rows[0];
+};
+
+const updatePassword = async (userId, hashedPassword) => {
+  await pool.query(
+    `
+    UPDATE users
+    SET password = $1,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = $2
+    `,
+    [hashedPassword, userId],
+  );
+};
+
+module.exports = { register, finduserByEmail, getUserById };

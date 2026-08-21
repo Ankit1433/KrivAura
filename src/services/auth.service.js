@@ -45,4 +45,24 @@ const login = async ({ email, password }) => {
   return { user, token };
 };
 
-module.exports = { register, login };
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await authRepository.getUserById(userId);
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+  if (!isMatch) {
+    throw new AppError('Current password is incorrect', 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await authRepository.updatePassword(userId, hashedPassword);
+
+  return true;
+};
+
+module.exports = { register, login, changePassword };
