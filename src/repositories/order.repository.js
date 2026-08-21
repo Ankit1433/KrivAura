@@ -230,7 +230,7 @@ const getOrderById = async (userId, orderId) => {
         oi.product_id,
         oi.quantity,
         oi.price,
-
+        oi.selected_size,
         p.name,
         p.discount_price,
 
@@ -427,7 +427,7 @@ const getOrderForShipment = async (orderId) => {
         oi.product_id,
         oi.quantity,
         oi.price,
-
+        oi.selected_size,
         p.name,
         p.sku,
         p.weight_grams,
