@@ -60,4 +60,4 @@ const updatePassword = async (userId, hashedPassword) => {
   );
 };
 
-module.exports = { register, finduserByEmail, getUserById };
+module.exports = { register, finduserByEmail, getUserById,updatePassword };
