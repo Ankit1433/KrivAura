@@ -19,23 +19,20 @@ const createOrder = async (
   }
 
   const a = address.rows[0];
-
   // 2. Create immutable shipping snapshot
-  const shippingAddress = `
-${a.full_name}
-${a.phone}
 
-${a.address_line1}
-${a.address_line2 || ''}
-
-${a.landmark || ''}
-
-${a.city}, ${a.state}
-${a.postal_code}
-
-${a.country}
-`.trim();
-
+  const shippingAddress = [
+    a.full_name,
+    a.phone,
+    a.address_line1,
+    a.address_line2,
+    a.landmark,
+    `${a.city}, ${a.state}`,
+    a.postal_code,
+    a.country,
+  ]
+    .filter((value) => value && value.trim())
+    .join('\n');
   // 3. Validate items
   if (!items || !items.length) {
     throw new AppError(messages.CART_EMPTY, 400);
