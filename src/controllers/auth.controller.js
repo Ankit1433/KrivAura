@@ -38,7 +38,7 @@ const changePassword = async (req, res, next) => {
       req.body.new_password,
     );
 
-    return successResponse(res, 'Password changed successfully');
+    return utils.successResponse(res, 'Password changed successfully');
   } catch (error) {
     next(error);
   }
