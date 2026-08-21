@@ -95,6 +95,12 @@ const createOrder = async (
     finalAmount = couponResult.finalAmount;
   }
 
+  // Add COD charge
+  const COD_CHARGE = 49;
+
+  if (paymentMethod === 'COD') {
+    finalAmount += COD_CHARGE;
+  }
   // 7. Create order
   const order = await orderRepository.createOrder(
     userId,
