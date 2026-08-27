@@ -6,7 +6,8 @@ const crypto = require('crypto');
 const orderRepository = require('../repositories/order.repository');
 
 const cashOnDelivery = async (orderId) => {
-  const order = await paymentRepository.markOrderPaid(orderId, 'Pending', null);
+ const order = await paymentRepository.markOrderCOD(orderId);
+  
 
   if (!order) {
     throw new AppError(messages.ORDER_NOT_FOUND, 404);

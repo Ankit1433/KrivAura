@@ -29,8 +29,26 @@ const updateRazorpayOrderId = async (orderId, razorpayOrderId) => {
 
   return result.rows[0];
 };
+const markOrderCOD = async (orderId) => {
+  const result = await pool.query(
+    `
+    UPDATE orders
+    SET
+      payment_status = 'Pending',
+      order_status = 'Confirmed',
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = $1
+      AND payment_method = 'COD'
+    RETURNING *
+    `,
+    [orderId],
+  );
+
+  return result.rows[0];
+};
 
 module.exports = {
   getOrderById,
   updateRazorpayOrderId,
+  markOrderCOD
 };
