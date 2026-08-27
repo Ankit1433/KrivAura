@@ -4,6 +4,7 @@ module.exports = {
   INTERNAL_SERVER_ERROR: 'Internal server error occurred',
   LOGIN_SUCCESS: 'Login Successful',
   INVALID_CREDENTIALS: 'Invalid email or password',
+  USER_NOT_EXISTS: 'User not exist',
   UNAUTHORIZED: 'Token is Required or Invalid',
   FORBIDDEN: 'Forbidden',
   CATEGORY_EXISTS: 'Category already exists',

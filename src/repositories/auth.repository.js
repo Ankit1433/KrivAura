@@ -29,8 +29,8 @@ const register = async (user) => {
   return result.rows[0];
 };
 
-const finduserByEmail = async (email) => {
-  const query = 'SELECT id,email,password,role FROM users WHERE email = $1';
+const findUserByEmailOrPhone = async (email) => {
+  const query = 'SELECT id,email,password,role FROM users WHERE email = $1 OR phone = $1';
   const result = await pool.query(query, [email]);
   return result.rows[0];
 };
@@ -60,4 +60,4 @@ const updatePassword = async (userId, hashedPassword) => {
   );
 };
 
-module.exports = { register, finduserByEmail, getUserById,updatePassword };
+module.exports = { register, findUserByEmailOrPhone, getUserById,updatePassword };

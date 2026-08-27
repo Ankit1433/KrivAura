@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const AppError = require('../utils/AppError');
 
 const register = async (user) => {
-  const existingUser = await authRepository.finduserByEmail(user.email);
+  const existingUser = await authRepository.findUserByEmailOrPhone(user.email);
   if (existingUser) {
     throw new Error(messages.EMAIL_EXISTS);
   }
@@ -22,14 +22,14 @@ const register = async (user) => {
 };
 
 const login = async ({ email, password }) => {
-  const user = await authRepository.finduserByEmail(email);
+  const user = await authRepository.findUserByEmailOrPhone(email);
   if (!user) {
-    throw new Error(messages.INVALID_CREDENTIALS, 401);
+    throw new AppError(messages.USER_NOT_EXISTS, 404);
   }
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
   if (!isPasswordCorrect) {
-    throw new Error(messages.INVALID_CREDENTIALS, 401);
+    throw new AppError(messages.INVALID_CREDENTIALS, 401);
   }
 
   const token = jwt.sign(
