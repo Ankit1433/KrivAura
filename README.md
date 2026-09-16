@@ -1,175 +1,109 @@
-# 🛍️ Kriaura Backend API
+# 🛍️ KrivAura – Full-Stack Ecommerce Application
 
-A production-ready Ecommerce Backend built with Node.js, Express.js and PostgreSQL following Clean Architecture.
+A full-stack Ecommerce application built with **Node.js, Express.js, PostgreSQL, React.js and Next.js**, featuring authentication, product management, cart, wishlist, orders, payments, and admin order management.
 
 ---
 
 ## 🚀 Features
 
-- Authentication & Authorization
-- JWT Login
-- Role Based Access
+### 🔐 Authentication & Authorization
+- User Registration & Login
+- JWT Authentication
+- Role-Based Authorization
+- Password Hashing
+- Protected Routes
+
+### 🛍️ Ecommerce
 - Categories
 - Products
 - Product Images
 - Cart
 - Wishlist
 - Orders
-- Razorpay Payment Integration
+- Order Cancellation
 - Admin Order Management
+
+### 💳 Payments
+- Razorpay Payment Integration
+- Razorpay Order Creation
+- Payment Verification
+
+### 🖥️ Frontend
+- React.js
+- Next.js
+- Responsive Web Interface
+- Authentication Flow
+- Product Listing & Details
+- Shopping Cart
+- Wishlist
+- Checkout
+- Order Management
+- Admin Interface
+
+### ⚙️ Backend
+- RESTful APIs
 - Global Error Handling
-- Zod Validation
-- PostgreSQL
+- Request Validation using Zod
+- PostgreSQL Database
+- Clean Architecture
+- Repository Pattern
 
 ---
 
 ## 🛠 Tech Stack
 
+### Frontend
+- React.js
+- Next.js
+- JavaScript
+- HTML
+- CSS
+
+### Backend
 - Node.js
 - Express.js
+- REST APIs
+
+### Database
 - PostgreSQL
+
+### Authentication & Security
 - JWT
 - bcrypt
-- Multer
+
+### Integrations & Services
 - Razorpay
+- Cloudinary
+- Multer
+
+### Validation
 - Zod
--cloudinary
 
 ---
 
 ## 📂 Project Structure
 
-src
+```text
+KrivAura
 │
-├── config
-├── constants
-├── controllers
-├── middlewares
-├── repositories
-├── routes
-├── services
-├── uploads
-├── utils
-├── validations
-
----
-
-## Installation
-
-```bash
-git clone <repo-url>
-
-cd ecommerce-backend
-
-npm install
-```
-
-Create `.env`
-
-```env
-PORT=3000
-
-DATABASE_URL=postgresql://postgres:password@localhost:5432/ecommerce
-
-JWT_SECRET=your_secret
-
-JWT_EXPIRES_IN=7d
-
-RAZORPAY_KEY_ID=
-
-RAZORPAY_KEY_SECRET=
-```
-
-Run
-
-```bash
-npm run dev
-```
-
----
-
-## Modules
-
-- Authentication
-- Categories
-- Products
-- Product Images
-- Cart
-- Wishlist
-- Orders
-- Payments
-- Admin
-
----
-
-## API Endpoints
-
-### Auth
-
-POST /auth/register
-
-POST /auth/login
-
-### Categories
-
-GET /categories
-
-POST /categories
-
-PUT /categories/:id
-
-DELETE /categories/:id
-
-### Products
-
-GET /products
-
-GET /products/:id
-
-POST /products
-
-PUT /products/:id
-
-DELETE /products/:id
-
-### Cart
-
-GET /cart
-
-POST /cart
-
-PUT /cart/:id
-
-DELETE /cart/:id
-
-### Wishlist
-
-GET /wishlist
-
-POST /wishlist
-
-DELETE /wishlist/:id
-
-### Orders
-
-POST /orders
-
-GET /orders
-
-GET /orders/:id
-
-PUT /orders/:id/cancel
-
-### Payments
-
-POST /payments/razorpay/create-order
-
-POST /payments/razorpay/verify
-
-### Admin
-
-GET /admin/orders
-
-GET /admin/orders/:id
-
-PUT /admin/orders/:id/status
+├── frontend
+│   ├── components
+│   ├── pages
+│   ├── app
+│   ├── services
+│   └── ...
+│
+├── backend
+│   └── src
+│       ├── config
+│       ├── constants
+│       ├── controllers
+│       ├── middlewares
+│       ├── repositories
+│       ├── routes
+│       ├── services
+│       ├── uploads
+│       ├── utils
+│       └── validations
+│
+└── README.md
