@@ -36,7 +36,7 @@ app.use(
       'http://localhost:3000',
       'http://localhost:5173',
       'http://127.0.0.1:5173',
-      'https://kriv-aura-ui.vercel.app/'
+      'https://kriv-aura-ui.vercel.app',
     ],
     credentials: true,
   }),
