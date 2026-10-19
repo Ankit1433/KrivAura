@@ -1,4 +1,5 @@
 const webhookService = require('../services/webhook.service');
+const paymentService = require('../services/payment.service');
 const AppError = require('../utils/AppError');
 
 const shipPrimeWebhook = async (req, res, next) => {
@@ -22,6 +23,21 @@ const shipPrimeWebhook = async (req, res, next) => {
   }
 };
 
+const cashfreeWebhook = async (req, res, next) => {
+  try {
+    await paymentService.processCashfreeWebhook(
+      req.body,
+      req.headers,
+      req.rawBody,
+    );
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   shipPrimeWebhook,
+  cashfreeWebhook,
 };

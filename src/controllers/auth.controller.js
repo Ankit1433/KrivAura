@@ -21,6 +21,15 @@ const login = async (req, res) => {
   }
 };
 
+const loginWithGoogle = async (req, res) => {
+  try {
+    const result = await authService.loginWithGoogle(req.body.credential);
+    return utils.successResponse(res, 'Google login successful', result, 200);
+  } catch (err) {
+    return utils.errorResponse(res, err.message, err.statusCode || 500);
+  }
+};
+
 const profile = async (req, res) => {
   return utils.successResponse(
     res,
@@ -46,6 +55,7 @@ const changePassword = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  loginWithGoogle,
   profile,
   changePassword,
 };

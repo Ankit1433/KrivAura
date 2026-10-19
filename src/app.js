@@ -21,13 +21,21 @@ const webhookRoutes = require('./routes/webhook.routes');
 const app = express();
 
 //Middleware
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buffer) => {
+      req.rawBody = buffer.toString('utf8');
+    },
+  }),
+);
 app.use(
   cors({
     origin: [
       'https://krivaura.com',
       'https://www.krivaura.com',
       'http://localhost:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
     ],
     credentials: true,
   }),

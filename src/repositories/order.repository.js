@@ -279,12 +279,10 @@ const cancelOrder = async (userId, orderId) => {
   return result.rows[0];
 };
 
-const completeOrder = async (
+const completeCashfreeOrder = async (
   orderId,
-  userId,
-  razorpayOrderId,
-  razorpayPaymentId,
-  razorpaySignature,
+  cashfreeOrderId,
+  cashfreePaymentId,
 ) => {
   const client = await pool.connect();
 
@@ -296,17 +294,22 @@ const completeOrder = async (
       SELECT *
       FROM orders
       WHERE id = $1
-        AND user_id = $2
+      FOR UPDATE
       `,
-      [orderId, userId],
+      [orderId],
     );
 
     if (!order.rows.length) {
       throw new Error('Order not found');
     }
 
+    if (order.rows[0].cashfree_order_id !== cashfreeOrderId) {
+      throw new Error('Cashfree order does not match the stored order');
+    }
+
     if (order.rows[0].payment_status === 'Paid') {
-      throw new Error('Order already paid');
+      await client.query('COMMIT');
+      return order.rows[0];
     }
 
     const items = await client.query(
@@ -356,14 +359,13 @@ const completeOrder = async (
       SET
           payment_status = 'Paid',
           order_status = 'Confirmed',
-          razorpay_order_id = $1,
-          razorpay_payment_id = $2,
-          razorpay_signature = $3,
+          payment_id = $1,
+          cashfree_payment_id = $1,
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = $4
+      WHERE id = $2
       RETURNING *
       `,
-      [razorpayOrderId, razorpayPaymentId, razorpaySignature, orderId],
+      [cashfreePaymentId, orderId],
     );
 
     await client.query('COMMIT');
@@ -497,7 +499,7 @@ module.exports = {
   getOrders,
   getOrderById,
   cancelOrder,
-  completeOrder,
+  completeCashfreeOrder,
   getOrderByIdForShipment,
   getOrderForShipment,
   getProductsForOrder,

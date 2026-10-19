@@ -1,29 +1,28 @@
 const express = require('express');
 
 const router = express.Router();
-
 const authenticate = require('../middlewares/auth.middleware');
 const paymentController = require('../controllers/payment.controller');
 const validate = require('../middlewares/validate.middleware');
 const {
-  createRazorpayOrderSchema,
+  createCashfreeOrderSchema,
+  verifyCashfreePaymentSchema,
 } = require('../validations/payment.validation');
-const { verifyPaymentSchema } = require('../validations/payment.validation');
 
 router.post('/cod/:id', authenticate, paymentController.cashOnDelivery);
 
 router.post(
-  '/razorpay/create-order',
+  '/cashfree/create-order',
   authenticate,
-  validate(createRazorpayOrderSchema),
-  paymentController.createRazorpayOrder,
+  validate(createCashfreeOrderSchema),
+  paymentController.createCashfreeOrder,
 );
 
 router.post(
-  '/razorpay/verify',
+  '/cashfree/verify',
   authenticate,
-  validate(verifyPaymentSchema),
-  paymentController.verifyPayment,
+  validate(verifyCashfreePaymentSchema),
+  paymentController.verifyCashfreePayment,
 );
 
 module.exports = router;

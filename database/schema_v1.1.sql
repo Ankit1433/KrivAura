@@ -156,12 +156,6 @@ CREATE TABLE orders (
 
     payment_id VARCHAR(255),
 
-    razorpay_order_id VARCHAR(255),
-
-    razorpay_payment_id VARCHAR(255),
-
-    razorpay_signature TEXT,
-
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

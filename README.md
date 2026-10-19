@@ -24,9 +24,8 @@ A full-stack Ecommerce application built with **Node.js, Express.js, PostgreSQL,
 - Admin Order Management
 
 ### 💳 Payments
-- Razorpay Payment Integration
-- Razorpay Order Creation
-- Payment Verification
+- Cashfree hosted checkout
+- Server-side payment verification and signed webhooks
 
 ### 🖥️ Frontend
 - React.js
@@ -72,7 +71,7 @@ A full-stack Ecommerce application built with **Node.js, Express.js, PostgreSQL,
 - bcrypt
 
 ### Integrations & Services
-- Razorpay
+- Cashfree Payments
 - Cloudinary
 - Multer
 
@@ -80,6 +79,19 @@ A full-stack Ecommerce application built with **Node.js, Express.js, PostgreSQL,
 - Zod
 
 ---
+
+## Cashfree setup
+
+Apply `database/schema_v1.4.sql` after the existing schema versions. Configure these backend environment variables:
+
+```env
+CASHFREE_CLIENT_ID=your_cashfree_app_id
+CASHFREE_CLIENT_SECRET=your_cashfree_secret
+CASHFREE_ENVIRONMENT=sandbox
+FRONTEND_URL=https://krivaura.com
+```
+
+Set `CASHFREE_ENVIRONMENT=production` when switching to live Cashfree credentials. The Cashfree webhook URL is `https://api.krivaura.com/api/v1/webhooks/cashfree`; configure it in the Cashfree dashboard for payment success events. Set `CASHFREE_RETURN_URL` only if needed; it must return to `/checkout` with Cashfree's `{order_id}` placeholder in the query string.
 
 ## 📂 Project Structure
 

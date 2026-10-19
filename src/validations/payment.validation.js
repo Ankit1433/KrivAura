@@ -1,20 +1,18 @@
 const { z } = require('zod');
 
-const createRazorpayOrderSchema = z.object({
+const createCashfreeOrderSchema = z.object({
   order_id: z.number().int().positive(),
 });
 
-const verifyPaymentSchema = z.object({
-  order_id: z.number().int().positive(),
-
-  razorpay_order_id: z.string(),
-
-  razorpay_payment_id: z.string(),
-
-  razorpay_signature: z.string(),
+const verifyCashfreePaymentSchema = z.object({
+  cashfree_order_id: z
+    .string()
+    .min(3)
+    .max(45)
+    .regex(/^[a-zA-Z0-9_-]+$/),
 });
 
 module.exports = {
-  createRazorpayOrderSchema,
-  verifyPaymentSchema,
+  createCashfreeOrderSchema,
+  verifyCashfreePaymentSchema,
 };

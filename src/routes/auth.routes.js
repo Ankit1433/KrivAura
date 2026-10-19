@@ -8,11 +8,17 @@ const { ADMIN } = require('../constants/roles');
 const {
   registerSchema,
   loginSchema,
+  googleLoginSchema,
   changePasswordSchema,
 } = require('../validations/auth.validation');
 
 router.post('/register', validate(registerSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
+router.post(
+  '/google',
+  validate(googleLoginSchema),
+  authController.loginWithGoogle,
+);
 router.get('/profile', authenticate, authController.profile);
 router.patch(
   '/change-password',
